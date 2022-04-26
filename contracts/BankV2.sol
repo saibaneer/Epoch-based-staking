@@ -119,7 +119,7 @@ contract BankV2 {
         uint reward = rewardBalance[msg.sender];
         rewardBalance[msg.sender] = 0;        
         
-        xyz_tokens.approve(msg.sender, reward);
+        //xyz_tokens.approve(msg.sender, reward);
         xyz_tokens.transfer(msg.sender, reward);
         emit WithdrawRewards(msg.sender, reward);
         reward = 0; 
