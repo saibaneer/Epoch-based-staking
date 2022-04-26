@@ -37,6 +37,7 @@ contract BankV2 {
     //Modifier
     
     modifier computeReward(address _account) {
+        require(balances[msg.sender] > 0, "You shall not Pass!");
         uint diff = block.timestamp - depositWindowEnds;
         uint double_timePeriodValue = 2*timePeriodValue;
         uint triple_timePeriodValue = 3*timePeriodValue;
@@ -80,7 +81,7 @@ contract BankV2 {
     } 
 
     function withdraw(uint _amount) public computeReward(msg.sender) {
-        require(balances[msg.sender] > 0, "You shall not Pass!");
+        //require(balances[msg.sender] > 0, "You shall not Pass!");
         uint amount = _amount;
         _amount = 0;
         balances[msg.sender] -= amount;

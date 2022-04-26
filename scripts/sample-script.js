@@ -5,11 +5,8 @@
 // Runtime Environment's members available in the global scope.
 const hre = require("hardhat");
 
-let alice;
-let bob;
-let charlie;
-let tokens;
-let bank;
+
+
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
@@ -18,20 +15,24 @@ async function main() {
   // If this script is run directly using `node` you may want to call compile
   // manually to make sure everything is compiled
   // await hre.run('compile');
+  let alice;
+  let tokens;
+  let bank;
 
   // We get the contract to deploy
-   [alice, bob, charlie] = await ethers.getSigners();
-   const Tokens = await ethers.getContractFactory("XYZ", charlie);
+   [alice] = await ethers.getSigners();
+   const Tokens = await ethers.getContractFactory("XYZ", alice);
    tokens = await Tokens.deploy(1000000000000);
    await tokens.deployed();
 
-   const Bank = await ethers.getContractFactory("BankV2", charlie);
-   bank = await Bank.deploy(tokens.address, 1, 10000);
+   const Bank = await ethers.getContractFactory("BankV2", alice);
+   bank = await Bank.deploy(tokens.address, 1, 100000);
    await bank.deployed();
 
-   await tokens.connect(charlie).approve(tokens.address, 100000);   
-   await tokens.connect(charlie).transfer(tokens.address, 100000);
+  await tokens.connect(alice).approve(bank.address, 100000);   
+  await tokens.connect(alice).transfer(bank.address, 100000);
 
+  console.log("Token is deployed to:", tokens.address);
   console.log("Bank is deployed to:", bank.address);
 }
 

@@ -6,12 +6,13 @@ describe("Tracelabs Smart Bank Contract", ()=>{
   let alice;
   let bob;
   let charlie;
+  let david;
   let tokens;
   let bank;
-  //let bankInterface;
+  
 
   before(async function(){
-    [alice, bob, charlie] = await ethers.getSigners();
+    [alice, bob, charlie, david] = await ethers.getSigners();
     const Tokens = await ethers.getContractFactory("XYZ", charlie);
     tokens = await Tokens.deploy(1000000000000);
     await tokens.deployed();
@@ -19,7 +20,7 @@ describe("Tracelabs Smart Bank Contract", ()=>{
     const Bank = await ethers.getContractFactory("BankV2", charlie);
     bank = await Bank.deploy(tokens.address, 1, 10000);
     await bank.deployed()
-    //bankInterface = await ethers.getContractAt("IERC20", tokens.address);
+    
   })
 
   it("Should test that contracts deployed successfully", async function() {
@@ -30,15 +31,15 @@ describe("Tracelabs Smart Bank Contract", ()=>{
   it("Should validate that accounts have been funded", async function(){
     await tokens.connect(charlie).approve(alice.address, 100);
     await tokens.connect(charlie).approve(bob.address, 400);
-    await tokens.connect(charlie).approve(tokens.address, 100000);
+    await tokens.connect(charlie).approve(bank.address, 100000);
 
     await tokens.connect(charlie).transfer(alice.address, 100);
     await tokens.connect(charlie).transfer(bob.address, 400);
-    await tokens.connect(charlie).transfer(tokens.address, 100000);
+    await tokens.connect(charlie).transfer(bank.address, 100000);
     
     expect(await tokens.balanceOf(alice.address)).to.equal(100);
     expect(await tokens.balanceOf(bob.address)).to.equal(400);
-    expect(await tokens.balanceOf(tokens.address)).to.equal(100000);
+    expect(await tokens.balanceOf(bank.address)).to.equal(100000);
 
   })
 
@@ -55,19 +56,39 @@ describe("Tracelabs Smart Bank Contract", ()=>{
     expect(await bank.connect(alice).getStakedBalance()).to.equal(0);
   })
 
-  it("Should  for withdrawal of reward tokens", async function () {   
+  it("Should confirm the withdrawal of reward tokens", async function () {   
     const bal1 = await tokens.balanceOf(alice.address);
     console.log("Alice's Balance before withdrawal is: ", bal1.toString()); 
     const balance_before_withdrawal_of_rewards = bal1;
-    //await tokens.approve(alice.address, 8000)
-    await bank.connect(alice).withdrawReward();
     
+    await bank.connect(alice).withdrawReward();    
     const balance_after_withdrawal_of_rewards = await tokens.balanceOf(alice.address);
-    console.log(balance_after_withdrawal_of_rewards)
-    assert(balance_after_withdrawal_of_rewards.toString() > balance_before_withdrawal_of_rewards.toString())
+
+    console.log("Alice's Balance after withdrawal is: ", balance_after_withdrawal_of_rewards.toString())
+    assert(balance_after_withdrawal_of_rewards.toString() > balance_before_withdrawal_of_rewards.toString())   
     
-    console.log(await tokens.balanceOf(tokens.address))
   });
+
+  it("Should NOT allow deposits after deposit time is passed", async function(){
+    try {
+      await bank.connect(alice).deposit(100);
+    } catch (error) {
+      assert(error.message.includes("Deposits are locked for now."));
+      return;
+    }
+    assert(false)
+  })
+
+  it("Should NOT allow non-stakers withdraw", async function(){
+    try {
+      await bank.connect(david).withdraw(22);
+    } catch (error) {
+      assert(error.message.includes("You shall not Pass!"));
+      return;
+    }
+    assert(false)
+  })
+    
 
   
 

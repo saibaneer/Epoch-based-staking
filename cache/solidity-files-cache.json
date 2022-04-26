@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "C:\\Users\\DELL\\Documents\\blockchain-projects-2022\\tracelabs\\contracts\\BankV2.sol": {
-      "lastModificationDate": 1650976088156,
-      "contentHash": "d9bb54ee971d18104fcd05c9cd91e2ee",
+      "lastModificationDate": 1650981757054,
+      "contentHash": "0cf9b631e3af702d943a7e173df2f0a6",
       "sourceName": "contracts/BankV2.sol",
       "solcConfig": {
         "version": "0.8.4",
